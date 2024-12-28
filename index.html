@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人网站</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header class="personal-header">
+            <div class="header-main">
+                <div class="avatar-container">
+                    <img :src="personalInfo.avatar" :alt="personalInfo.name + '的头像'" class="avatar">
+                </div>
+                <h1 class="name">{{ personalInfo.name }}</h1>
+            </div>
+            <p class="bio">{{ personalInfo.bio }}</p>
+        </header>
+
+        <section class="info-section">
+            <div v-for="(img, index) in personalInfo.infoImages" 
+                 :key="index"
+                 class="info-item"
+                 :class="img.position">
+                <div class="info-content">
+                    <div class="info-text">
+                        <h2 class="info-title">{{ img.title }}</h2>
+                        <p class="info-description">{{ img.description }}</p>
+                    </div>
+                    <div class="info-image-container">
+                        <img :src="img.url" :alt="img.title" class="info-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="carousel-section">
+            <div class="carousel">
+                <button class="carousel-button prev" @click="prevSlide">
+                    <span class="arrow">&lt;</span>
+                </button>
+                <div class="carousel-track">
+                    <div v-for="(slide, index) in slides" 
+                         :key="index" 
+                         class="carousel-slide"
+                         :class="{ active: currentSlide === index }">
+                        <img :src="slide.url" :alt="slide.description">
+                        <div class="slide-overlay">
+                            <p class="slide-description">{{ slide.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-button next" @click="nextSlide">
+                    <span class="arrow">&gt;</span>
+                </button>
+                <div class="carousel-indicators">
+                    <span v-for="(_, index) in slides" 
+                          :key="index"
+                          class="indicator"
+                          :class="{ active: currentSlide === index }"
+                          @click="setSlide(index)">
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <section class="message-section">
+            <div class="message-input-container">
+                <input type="text" 
+                       class="message-input" 
+                       v-model="userInput"
+                       @keyup.enter="sendMessage"
+                       placeholder="问我点什么吧...">
+                <button class="ai-send-button" 
+                        @click="sendMessage"
+                        :disabled="isTyping || !userInput.trim()">
+                    <span class="ai-icon" :class="{ 'is-typing': isTyping }">AI</span>
+                </button>
+            </div>
+        </section>
+
+        <div class="corner-social">
+            <a v-for="(social, index) in socialLinks"
+               :key="index"
+               :href="social.url"
+               class="corner-social-link"
+               :target="social.url === '#' ? '' : '_blank'"
+               @click="handleSocialClick(social)">
+                <div class="corner-social-icon">
+                    <img :src="social.icon" :alt="social.name">
+                </div>
+            </a>
+        </div>
+
+        <div class="modal-overlay" v-if="showWechatQR" @click="showWechatQR = false"></div>
+        <div class="wechat-qr" v-if="showWechatQR">
+            <span class="wechat-qr-close" @click="showWechatQR = false">&times;</span>
+            <img src="imgs/img4.jpg" alt="微信二维码">
+            <p style="text-align: center; margin-top: 10px; color: #666;">扫码添加微信</p>
+        </div>
+
+        <div class="modal-overlay" v-if="showChatModal" @click="showChatModal = false"></div>
+        <div class="chat-modal" v-if="showChatModal">
+            <div class="chat-header">
+                <h3>AI 对话</h3>
+                <span class="chat-close" @click="showChatModal = false">&times;</span>
+            </div>
+            <div v-if="error" class="error-message">{{ error }}</div>
+            <div class="chat-messages" ref="chatMessages">
+                <div v-for="(msg, index) in chatMessages" 
+                     :key="index" 
+                     class="message"
+                     :class="msg.type">
+                    <div class="message-content">{{ msg.content }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html> 
